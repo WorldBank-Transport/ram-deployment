@@ -1,0 +1,22 @@
+{
+  "name": "ram-deployment",
+  "version": "1.0.0",
+  "description": "RAM deployment with the CloudFormation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developmentseed/ram-deployment.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/developmentseed/ram-deployment/issues"
+  },
+  "homepage": "https://github.com/developmentseed/ram-deployment#readme",
+  "dependencies": {
+    "kes": "^2.1.2"
+  }
+}

@@ -1,0 +1,29 @@
+default:
+  stackName: ram-deploy-cf
+  bucket: ram-cf-bucket 
+  capabilities:
+    - CAPABILITY_NAMED_IAM
+
+  vpc: vpc-dfe524ba
+  ecs:
+    publicIp: true # whether the ec2 instance have public IP addresses
+    subnets:
+      - subnet-7945cb75
+    amiid: ami-aff65ad2	 # which ec2 AMI to use for the ec2 instances
+    instanceType: t2.small # size of the ec2 instance
+    volumeSize: 30 # the size of the storage on the ec2 instance
+    keyPairName: ruralroads # the ssh key to use for login into instance
+    availabilityZone: us-east-1f
+    maxInstances: 2 
+    desiredInstances: 2
+  
+  tags:
+    project: ram-project
+    owner: mr_olaf
+
+olaf:
+  bucket: olaf-bucket
+
+alireza:
+  bucket: xxxx
+
