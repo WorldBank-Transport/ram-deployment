@@ -14,16 +14,11 @@ default:
     volumeSize: 30 # the size of the storage on the ec2 instance
     keyPairName: ruralroads # the ssh key to use for login into instance
     availabilityZone: us-east-1f
-    maxInstances: 2 
-    desiredInstances: 2
+    maxInstances: 1
+    desiredInstances: 1
   
   tags:
-    project: ram-project
-    owner: mr_olaf
+    project: ruralroads
 
-olaf:
-  bucket: olaf-bucket
-
-alireza:
-  bucket: xxxx
-
+ds-staging:
+  stackName: ram-staging-deploy-cf
