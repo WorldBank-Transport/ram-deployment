@@ -8,6 +8,7 @@
 ## Installation
 
      $ yarn
+     $ cp .kes/.env.sample .kes/.env
 
 ## Deployment
 
