@@ -42,6 +42,7 @@ default:
             ANL_SERVICE: hyper
             ANL_STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
             STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
+            DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
@@ -51,7 +52,7 @@ default:
           commands:
             - node
             - index.js
-        postgis:
+        ram-postgis:
           image: mdillon/postgis
           memory: 500 # defaults to 256mb
           mount:
