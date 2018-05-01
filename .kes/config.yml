@@ -55,6 +55,10 @@ default:
         ram-postgis:
           image: mdillon/postgis
           memory: 500 # defaults to 256mb
+          ports:
+            - host: 5432
+              container: 5432
+              protocol: tcp
           mount:
             volume: pos
             destination: /var/lib/postgresql/data
