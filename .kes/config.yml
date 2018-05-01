@@ -40,8 +40,6 @@ default:
             ANL_CONTAINER: wbtransport/rra-analysis:latest-dev
             ANL_DB: 'postgresql://rra:rra@{{ANL_IP_ADDRESS}}:5432/rra'
             ANL_SERVICE: hyper
-            ANL_STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
-            STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
             DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
