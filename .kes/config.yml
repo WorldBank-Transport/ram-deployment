@@ -49,6 +49,8 @@ default:
             STORAGE_REGION: '{{STORAGE_REGION}}'
             STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
+            VT_SERVICE: hyper
+            VT_CONTAINER: wbtransport/rra-vt:latest-stable
           commands:
             - node
             - index.js
