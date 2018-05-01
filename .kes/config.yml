@@ -31,7 +31,7 @@ default:
           #cpu: 10 # this is an optional key
           memory: 500 # defaults to 256mb
           links:
-            - postgis
+            - ram-postgis
           ports:
             - host: 80
               container: 4000 
@@ -45,6 +45,8 @@ default:
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
             HYPER_SIZE: L3
+            STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
+            STORAGE_REGION: '{{STORAGE_REGION}}'
             STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
           commands:
