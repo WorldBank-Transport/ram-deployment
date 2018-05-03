@@ -73,10 +73,23 @@ Resources:
     Properties:
       GroupName: {{stackName}}-ecs-securitygroup
       GroupDescription: Security Group for ECS containter instances of {{stackName}}
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: '80'
+          ToPort: '80'
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: '22'
+          ToPort: '22'
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: '5432'
+          ToPort: '5432'
       Tags:
         - Key: Name
           Value: "{{stackName}}"
-      VpcId: {{vpc}}
+      VpcId: {{vpc.id}}
 
   ECSCluster:
     Type: AWS::ECS::Cluster
@@ -160,12 +173,8 @@ Resources:
     Properties:
       AvailabilityZones:
         - {{ecs.availabilityZone}}
-    {{# if vpc.subnets }}
       VPCZoneIdentifier:
-      {{#each vpc.subnets}}
-        - {{this}}
-      {{/each}}
-    {{/if}}
+        - {{vpc.subnet}}
       LaunchConfigurationName:
         Ref: ContainerInstanceLaunch
       MinSize: '0'
@@ -175,3 +184,84 @@ Resources:
       - Key: Name
         Value: "{{stackName}}-ecs"
         PropagateAtLaunch: true
+
+  # adding TaskDefinition for Lambda/ECS services
+{{#each taskDefinitions}}
+  {{@key}}TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Volumes:
+        - Name: {{this.volume.name}}
+          Host:
+            SourcePath: {{this.volume.path}} 
+      {{# if this.networkMode }}
+      NetworkMode: {{this.networkMode}}
+      {{/if}}
+      ContainerDefinitions:
+      {{#each this.containers}}
+        - Name: {{@key}}
+          Cpu: {{#if this.cpu }}{{ this.cpu }}{{ else }}10{{/if}}
+          Essential: true
+          {{#if this.mount}}
+          MountPoints:
+            - SourceVolume: {{this.mount.volume}}
+              ContainerPath: {{this.mount.destination}}
+          {{/if}}
+        {{#if this.ports}}
+          PortMappings:
+          {{#each this.ports}}
+            - ContainerPort: {{this.container}} 
+              HostPort: {{this.host}}
+              Protocol: {{this.protocol}}
+          {{/each}}
+        {{/if}}
+        {{#if this.links}}
+          Links:
+          {{#each this.links}}
+            - {{this}}
+          {{/each}}
+        {{/if}}
+        {{#if this.envs}}
+          Environment:
+          {{# each this.envs}}
+            - Name: {{@key}}
+              Value: {{this}}
+          {{/each}}
+        {{/if}}
+          Image: {{this.image}}
+          MemoryReservation: {{#if this.memory }}{{ this.memory }}{{ else }}256{{/if}}
+      {{# if this.commands }}
+          Command:
+        {{# each this.commands }}
+            - {{{ @this }}}
+        {{/each}}
+      {{/if}}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: {{@../key}}EcsLogs
+              awslogs-region:
+                Fn::Sub: ${AWS::Region}
+      {{/each}}
+
+  {{@key}}EcsLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: {{../stackName}}-{{@key}}EcsLogs
+
+  {{@key}}ECSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+    - ECSAutoScalingGroup
+    Properties:
+      Cluster:
+        Ref: ECSCluster
+      DesiredCount: {{# if this.count}}{{this.count}}{{ else }} 0 {{/if}}
+      TaskDefinition:
+        Ref: {{@key}}TaskDefinition
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0
+
+{{/each}}
