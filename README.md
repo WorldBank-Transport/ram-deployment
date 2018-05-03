@@ -12,16 +12,12 @@
 
 ## Deployment
 
-- edit `.kes/config.yml` and add a new deployment key with a new stack and bucket names
-
+- create an S3 bucket for the CF config (eg. `ram-cf-bucket`)
+- edit `.kes/config.yml` and add a new deployment key with a new stack and bucket names  
 ```yaml
 mydeployment:
   stackName: mystackName
   bucket: myBucket
 ```
-
-- Deploy with Kes
-
+- Deploy with Kes  
      $ ./node_modules/.bin/kes cf deploy --deployment mydeployment --region us-east-1 --profile nameOfMyawsProfile
-
-     

@@ -31,7 +31,7 @@ default:
           #cpu: 10 # this is an optional key
           memory: 500 # defaults to 256mb
           links:
-            - postgis
+            - ram-postgis
           ports:
             - host: 80
               container: 4000 
@@ -40,20 +40,27 @@ default:
             ANL_CONTAINER: wbtransport/rra-analysis:latest-dev
             ANL_DB: 'postgresql://rra:rra@{{ANL_IP_ADDRESS}}:5432/rra'
             ANL_SERVICE: hyper
-            ANL_STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
-            STORAGE_HOST: '{{ANL_IP_ADDRESS}}'
+            DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
             HYPER_SIZE: L3
+            STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
+            STORAGE_REGION: '{{STORAGE_REGION}}'
             STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
+            VT_SERVICE: hyper
+            VT_CONTAINER: wbtransport/rra-vt:latest-stable
           commands:
             - node
             - index.js
-        postgis:
+        ram-postgis:
           image: mdillon/postgis
           memory: 500 # defaults to 256mb
+          ports:
+            - host: 5432
+              container: 5432
+              protocol: tcp
           mount:
             volume: pos
             destination: /var/lib/postgresql/data
