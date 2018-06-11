@@ -8,15 +8,22 @@ default:
     id: vpc-dfe524ba
     subnet: subnet-7945cb75
 
+  # instances created by this config are configured to work with ECS service
   ecs:
     publicIp: true # whether the ec2 instance have public IP addresses
     availabilityZone: us-east-1f # IMPORTANT: subnet and availability zone must be in the same zone
-    amiid: ami-aff65ad2	 # which ec2 AMI to use for the ec2 instances
-    instanceType: t2.small # size of the ec2 instance
-    volumeSize: 30 # the size of the storage on the ec2 instance
+    amiid: ami-5253c32d	 # which ec2 AMI to use for the ec2 instances
     keyPairName: ruralroads # the ssh key to use for login into instance
-    maxInstances: 1
-    desiredInstances: 1
+    # only uncomment this if autoscaling ec2 support is needed
+    # autoscaling:
+    #   instanceType: t2.small # size of the ec2 instance
+    #   volumeSize: 30 # the size of the storage on the ec2 instance
+    #   maxInstances: 0
+    #   desiredInstances: 0
+    ec2:
+      api:
+        instanceType: t2.small # size of the ec2 instance
+        volumeSize: 30
 
   taskDefinitions:
     ram:
