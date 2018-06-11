@@ -20,4 +20,4 @@ mydeployment:
   bucket: myBucket
 ```
 - Deploy with Kes  
-     $ ./node_modules/.bin/kes cf deploy --deployment mydeployment --region us-east-1 --profile nameOfMyawsProfile
+     $ ./node_modules/.bin/kes cf deploy --deployment mydeployment --region us-east-1 --profile nameOfMyawsProfile --showOutputs

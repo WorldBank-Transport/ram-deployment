@@ -330,3 +330,16 @@ Resources:
   #################################################
   # TaskDefinition END 
   #################################################
+
+
+{{# if ecs.ec2}}
+Outputs:
+  {{# each ecs.ec2}}
+  {{@key}}IpAddress:
+    Value:
+      Fn::GetAtt:
+        - {{@key}}EC2Instance
+        - PublicIp
+  {{/each}}
+{{/if}}
+
