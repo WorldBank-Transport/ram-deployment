@@ -1,6 +1,6 @@
 default:
-  stackName: ram-deploy-cf
-  bucket: ram-cf-bucket 
+  stackName: ram-demo-cf
+  bucket: ram-demo
   capabilities:
     - CAPABILITY_NAMED_IAM
 
@@ -12,7 +12,7 @@ default:
     publicIp: true # whether the ec2 instance have public IP addresses
     availabilityZone: us-east-1f # IMPORTANT: subnet and availability zone must be in the same zone
     amiid: ami-aff65ad2	 # which ec2 AMI to use for the ec2 instances
-    instanceType: t2.small # size of the ec2 instance
+    instanceType: t2.medium # size of the ec2 instance
     volumeSize: 30 # the size of the storage on the ec2 instance
     keyPairName: ruralroads # the ssh key to use for login into instance
     maxInstances: 1
@@ -29,7 +29,7 @@ default:
         ram-api:
           image: wbtransport/rra-api:latest-dev
           #cpu: 10 # this is an optional key
-          memory: 500 # defaults to 256mb
+          memory: 2500 # defaults to 256mb
           links:
             - ram-postgis
           ports:
@@ -56,7 +56,7 @@ default:
             - index.js
         ram-postgis:
           image: mdillon/postgis
-          memory: 500 # defaults to 256mb
+          memory: 1000 # defaults to 256mb
           ports:
             - host: 5432
               container: 5432
@@ -68,6 +68,15 @@ default:
             POSTGRES_DB: rra
             POSTGRES_PASSWORD: rra
             POSTGRES_USER: rra
+        ram-frontend:
+          image: wbtransport/ram-frontend:v0.6.0
+          ports:
+            - host: 80
+              container: 8080
+              protocol: tcp
+          envs:
+            API: '{{PLACE IP OF API HERE}}'
+            MBTOKEN: '{{MB_TOKEN}}'
 
   tags:
     project: ruralroads
@@ -75,5 +84,6 @@ default:
 ds-staging:
   stackName: ram-staging-deploy-cf
 
-aj-staging:
-  stackName: aj-ram-staging
+ram-demo:
+  stackName: ram-demo-cf
+  bucket: ram-demo
