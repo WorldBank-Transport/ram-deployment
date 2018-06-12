@@ -341,15 +341,15 @@ Resources:
         {{#if this.envs}}
           Environment:
           {{# if this.includeRds}}
-            # - Name: DB_CONNECTION 
-            #   Value: 
-            #     Fn::Join:
-            #       - ""
-            #       - - "postgresql://{{../../rds.username}}:{{../../rds.password}}@"
-            #         - Fn::GetAtt:
-            #             - RDS
-            #             - Endpoint.Address
-            #         - ":5432/{{../../rds.dbName}}"
+            - Name: DB_CONNECTION 
+              Value: 
+                Fn::Join:
+                  - ""
+                  - - "postgresql://{{../../rds.username}}:{{../../rds.password}}@"
+                    - Fn::GetAtt:
+                        - RDS
+                        - Endpoint.Address
+                    - ":5432/{{../../rds.dbName}}"
           {{/if}}
           {{# each this.envs}}
             - Name: {{@key}}
