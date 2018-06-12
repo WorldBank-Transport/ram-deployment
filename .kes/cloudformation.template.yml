@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'stack: {{stackName}} | deployed by Kes'
 
 Resources:
+  #################################################
+  # IAM Roles BEGIN
+  #################################################
+
   ECSRole:
     Type: AWS::IAM::Role
     Properties:
@@ -68,6 +72,15 @@ Resources:
       Roles:
         - !Ref ECSRole
 
+  #################################################
+  # IAM Roles END
+  #################################################
+
+  #################################################
+  # ECS config BEGIN
+  #################################################
+
+
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -94,6 +107,48 @@ Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
 
+{{# if ecs.ec2}}
+  {{# each ecs.ec2}}
+  {{@key}}EC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: {{../ecs.amiid}}
+      InstanceType: {{this.instanceType}}
+      AvailabilityZone: {{../ecs.availabilityZone}}
+      IamInstanceProfile:
+        Ref: InstanceProfile
+      KeyName: {{ ../ecs.keyPairName }}
+      SecurityGroupIds:
+        - Fn::GetAtt:
+          - SecurityGroup
+          - GroupId
+      SubnetId: {{../vpc.subnet}}
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            - - "#!/bin/bash\n"
+              - Fn::Sub: "echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config"
+      Volumes: 
+        - VolumeId:
+            Ref: {{@key}}Ec2Volume
+          Device: "/dev/sdk"
+      Tags:
+        - Key: Name
+          Value: "{{../stackName}}-{{@key}}"
+        - Key: Stack
+          Value: {{../stackName}}
+
+  {{@key}}Ec2Volume:
+    Type: "AWS::EC2::Volume"
+    Properties:
+      Size: {{this.volumeSize}}
+      AvailabilityZone: {{../ecs.availabilityZone}}
+
+  {{/each}}
+{{/if}}
+
+{{# if ecs.autoscaling}}
   ContainerInstanceLaunch:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
@@ -141,7 +196,7 @@ Resources:
           - SecurityGroup
           - GroupId
       ImageId: {{ecs.amiid}}
-      InstanceType: {{ecs.instanceType}}
+      InstanceType: {{ecs.autoscaling.instanceType}}
       IamInstanceProfile:
         Fn::GetAtt:
           - InstanceProfile
@@ -150,7 +205,7 @@ Resources:
       - DeviceName: "/dev/xvda"
         Ebs:
           DeleteOnTermination: true
-          VolumeSize: {{ecs.volumeSize}}
+          VolumeSize: {{ecs.autoscaling.volumeSize}}
     {{# if ecs.keyPairName }}
       KeyName: {{ ecs.keyPairName }}
     {{/if}}
@@ -178,12 +233,21 @@ Resources:
       LaunchConfigurationName:
         Ref: ContainerInstanceLaunch
       MinSize: '0'
-      MaxSize: {{ ecs.maxInstances }}
-      DesiredCapacity: {{ ecs.desiredInstances }}
+      MaxSize: {{ ecs.autoscaling.maxInstances }}
+      DesiredCapacity: {{ ecs.autoscaling.desiredInstances }}
       Tags:
       - Key: Name
         Value: "{{stackName}}-ecs"
         PropagateAtLaunch: true
+{{/if}}
+
+  #################################################
+  # ECS config END
+  #################################################
+
+  #################################################
+  # TaskDefinition BEGIN
+  #################################################
 
   # adding TaskDefinition for Lambda/ECS services
 {{#each taskDefinitions}}
@@ -252,8 +316,6 @@ Resources:
 
   {{@key}}ECSService:
     Type: AWS::ECS::Service
-    DependsOn:
-    - ECSAutoScalingGroup
     Properties:
       Cluster:
         Ref: ECSCluster
@@ -262,6 +324,22 @@ Resources:
         Ref: {{@key}}TaskDefinition
       DeploymentConfiguration:
         MaximumPercent: 100
-        MinimumHealthyPercent: 0
-
+        MinimumHealthyPercent: 0 
 {{/each}}
+
+  #################################################
+  # TaskDefinition END 
+  #################################################
+
+
+{{# if ecs.ec2}}
+Outputs:
+  {{# each ecs.ec2}}
+  {{@key}}IpAddress:
+    Value:
+      Fn::GetAtt:
+        - {{@key}}EC2Instance
+        - PublicIp
+  {{/each}}
+{{/if}}
+

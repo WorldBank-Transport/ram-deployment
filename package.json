@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/developmentseed/ram-deployment#readme",
   "dependencies": {
-    "kes": "^2.1.2"
+    "kes": "^2.2.2"
   }
 }
