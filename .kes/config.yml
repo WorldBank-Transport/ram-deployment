@@ -8,6 +8,15 @@ default:
     id: vpc-dfe524ba
     subnet: subnet-7945cb75
 
+  rds:
+    type: db.t2.small
+    username: rra
+    password: '{{DB_PASSWORD}}'
+    dbName: rra
+    engine: postgres
+    version: '9.6.8'
+    storage: 20
+
   # instances created by this config are configured to work with ECS service
   ecs:
     publicIp: true # whether the ec2 instance have public IP addresses
@@ -37,17 +46,18 @@ default:
           image: wbtransport/rra-api:latest-dev
           #cpu: 10 # this is an optional key
           memory: 500 # defaults to 256mb
-          links:
-            - ram-postgis
           ports:
             - host: 80
               container: 4000 
               protocol: tcp
+          commands:
+            - node
+            - index.js
+          includeRds: true # set to true if RDS is used
           envs:
             ANL_CONTAINER: wbtransport/rra-analysis:latest-dev
-            ANL_DB: 'postgresql://rra:rra@{{ANL_IP_ADDRESS}}:5432/rra'
             ANL_SERVICE: hyper
-            DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
+            ANL_DB: 'postgresql://rra:rra@{{ANL_IP_ADDRESS}}:5432/rra'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
@@ -58,23 +68,27 @@ default:
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
             VT_SERVICE: hyper
             VT_CONTAINER: wbtransport/rra-vt:latest-stable
-          commands:
-            - node
-            - index.js
-        ram-postgis:
-          image: mdillon/postgis
-          memory: 500 # defaults to 256mb
-          ports:
-            - host: 5432
-              container: 5432
-              protocol: tcp
-          mount:
-            volume: pos
-            destination: /var/lib/postgresql/data
-          envs:
-            POSTGRES_DB: rra
-            POSTGRES_PASSWORD: rra
-            POSTGRES_USER: rra
+
+            # uncomment this part if a docker container is used as db 
+            # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
+          # links:
+            # - ram-postgis
+        
+        # uncomment this part only if you are not going to use RDS
+        # ram-postgis:
+        #   image: mdillon/postgis
+        #   memory: 500 # defaults to 256mb
+        #   ports:
+        #     - host: 5432
+        #       container: 5432
+        #       protocol: tcp
+        #   mount:
+        #     volume: pos
+        #     destination: /var/lib/postgresql/data
+        #   envs:
+        #     POSTGRES_DB: rra
+        #     POSTGRES_PASSWORD: rra
+        #     POSTGRES_USER: rra
 
   tags:
     project: ruralroads

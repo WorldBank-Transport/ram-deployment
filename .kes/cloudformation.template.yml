@@ -101,7 +101,7 @@ Resources:
           ToPort: '5432'
       Tags:
         - Key: Name
-          Value: "{{stackName}}"
+          Value: "{{stackName}}-ecs2"
       VpcId: {{vpc.id}}
 
   ECSCluster:
@@ -246,6 +246,59 @@ Resources:
   #################################################
 
   #################################################
+  # RDS BEGIN
+  #################################################
+
+  RdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: {{stackName}}-rds-securitygroup
+      GroupDescription: Security Group for RDS instances of {{stackName}}
+      SecurityGroupIngress:
+      {{#if ecs.ec2}}
+        {{# each ecs.ec2}}
+        - IpProtocol: tcp
+          CidrIp:
+            Fn::Join:
+              - ""
+              - - Fn::GetAtt:
+                  - {{@key}}EC2Instance
+                  - PublicIp
+                - "/32"
+          FromPort: '5432'
+          ToPort: '5432'
+        {{/each}}
+      {{/if}}
+      Tags:
+        - Key: Name
+          Value: "{{stackName}}-rds"
+      VpcId: {{vpc.id}}
+
+  RDS:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AllocatedStorage: {{rds.storage}}
+      DBInstanceClass: {{rds.type}}
+      DBInstanceIdentifier: {{stackName}}-db-rds
+      MasterUsername: {{rds.username}} 
+      MasterUserPassword: {{rds.password}}
+      PubliclyAccessible: true
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+          - SecurityGroup
+          - GroupId
+      DBName: {{rds.dbName}}
+      Engine: {{rds.engine}}
+      EngineVersion: {{rds.version}}
+      Tags:
+        - Key: Name
+          Value: "{{stackName}}-postgres"
+
+  #################################################
+  # RDS END
+  #################################################
+
+  #################################################
   # TaskDefinition BEGIN
   #################################################
 
@@ -287,6 +340,17 @@ Resources:
         {{/if}}
         {{#if this.envs}}
           Environment:
+          {{# if this.includeRds}}
+            # - Name: DB_CONNECTION 
+            #   Value: 
+            #     Fn::Join:
+            #       - ""
+            #       - - "postgresql://{{../../rds.username}}:{{../../rds.password}}@"
+            #         - Fn::GetAtt:
+            #             - RDS
+            #             - Endpoint.Address
+            #         - ":5432/{{../../rds.dbName}}"
+          {{/if}}
           {{# each this.envs}}
             - Name: {{@key}}
               Value: {{this}}
