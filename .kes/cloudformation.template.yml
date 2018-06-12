@@ -249,6 +249,7 @@ Resources:
   # RDS BEGIN
   #################################################
 
+{{#if rds}}
   RdsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -293,6 +294,8 @@ Resources:
       Tags:
         - Key: Name
           Value: "{{stackName}}-postgres"
+{{/if}}
+
 
   #################################################
   # RDS END
