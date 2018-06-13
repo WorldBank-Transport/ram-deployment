@@ -26,15 +26,18 @@ default:
         volumeSize: 30
       frontend:
         instanceType: t2.micro
-        volumeSize: 2
+        volumeSize: 8
 
   taskDefinitions:
-    ram:
+    ramApi:
       count: 0 
       networkMode: null
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
+      placementConstraints:
+        type: memberOf
+        expression: "attribute:ecs.instance-type == t2.medium"
       containers:
         ram-api:
           image: wbtransport/rra-api:latest-dev
@@ -64,9 +67,6 @@ default:
           commands:
             - node
             - index.js
-          placementConstraints:
-            type: memberOf
-            expression: "attribute:ecs.instance-type = t2.medium"
         ram-postgis:
           image: mdillon/postgis
           memory: 1000 # defaults to 256mb
@@ -81,9 +81,16 @@ default:
             POSTGRES_DB: rra
             POSTGRES_PASSWORD: rra
             POSTGRES_USER: rra
-          placementConstraints:
-            type: memberOf
-            expression: "attribute:ecs.instance-type = t2.medium"
+    ramFrontend:
+      count: 0
+      networkMode: null
+      volume:
+        name: pos
+        path: /var/lib/postgresql/data # this is the path on the source machine
+      placementConstraints:
+        type: memberOf
+        expression: "attribute:ecs.instance-type == t2.micro"
+      containers:
         ram-frontend:
           image: wbtransport/ram-frontend:v0.6.0
           ports:
@@ -93,9 +100,6 @@ default:
           envs:
             API: http://12345678
             MBTOKEN: '{{MB_TOKEN}}'
-          placementConstraints:
-            type: memberOf
-            expression: "attribute:ecs.instance-type = t2.micro"
   tags:
     project: ruralroads
 

@@ -261,6 +261,13 @@ Resources:
       {{# if this.networkMode }}
       NetworkMode: {{this.networkMode}}
       {{/if}}
+    {{#if this.placementConstraints }}
+      PlacementConstraints:
+        - type: {{this.placementConstraints.type}}
+      {{#if this.placementConstraints.expression}}
+          expression: {{{this.placementConstraints.expression}}}
+      {{/if}}
+    {{/if}}
       ContainerDefinitions:
       {{#each this.containers}}
         - Name: {{@key}}
