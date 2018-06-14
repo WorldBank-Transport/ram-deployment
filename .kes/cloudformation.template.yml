@@ -294,6 +294,16 @@ Resources:
         {{/if}}
         {{#if this.envs}}
           Environment:
+          {{#if this.apiMachine}}
+            - Name: API
+              Value:
+                Fn::Join:
+                  - ""
+                  - - "http://"
+                    - Fn::GetAtt:
+                      - {{this.apiMachine}}EC2Instance
+                      - PublicIp
+          {{/if}}
           {{# each this.envs}}
             - Name: {{@key}}
               Value: {{this}}

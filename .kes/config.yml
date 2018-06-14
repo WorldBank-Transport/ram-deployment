@@ -30,14 +30,11 @@ default:
 
   taskDefinitions:
     ramApi:
-      count: 0 
+      count: 1
       networkMode: null
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
-      placementConstraints:
-        type: memberOf
-        expression: "attribute:ecs.instance-type == t2.medium"
       containers:
         ram-api:
           image: wbtransport/rra-api:latest-dev
@@ -82,23 +79,20 @@ default:
             POSTGRES_PASSWORD: rra
             POSTGRES_USER: rra
     ramFrontend:
-      count: 0
+      count: 1
       networkMode: null
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
-      placementConstraints:
-        type: memberOf
-        expression: "attribute:ecs.instance-type == t2.micro"
       containers:
         ram-frontend:
           image: wbtransport/ram-frontend:v0.6.0
           ports:
             - host: 80
-              container: 8080
+              container: 80
               protocol: tcp
+          apiMachine: api # name of the EC2 machine that the API is hosted on
           envs:
-            API: http://12345678
             MBTOKEN: '{{MB_TOKEN}}'
   tags:
     project: ruralroads
