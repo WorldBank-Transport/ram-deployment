@@ -1,12 +1,21 @@
 default:
   stackName: ram-demo-test-cf
-  bucket: ram-demo
+  bucket: ram-demo-test
   capabilities:
     - CAPABILITY_NAMED_IAM
 
   vpc:
     id: vpc-dfe524ba
     subnet: subnet-7945cb75
+
+  rds:
+    type: db.t2.small
+    username: ram
+    password: '{{DB_PASSWORD}}'
+    dbName: ram
+    engine: postgres
+    version: '9.6.8'
+    storage: 20
 
   # instances created by this config are configured to work with ECS service
   ecs:
@@ -40,17 +49,17 @@ default:
           image: wbtransport/ram-backend:v0.5.0
           #cpu: 10 # this is an optional key
           memory: 2500 # defaults to 256mb
-          links:
-            - ram-postgis
           ports:
             - host: 80
               container: 4000 
               protocol: tcp
+          commands:
+            - node
+            - index.js
+          includeRds: true # set to true if RDS is used. ANL_DB and DB_CONNECTION will both be set automatically
           envs:
             ANL_CONTAINER: wbtransport/ram-analysis:v0.1.0
-            ANL_DB: 'postgresql://ram:ram@{{ANL_IP_ADDRESS}}:5432/ram'
             ANL_SERVICE: hyper
-            DB_CONNECTION: 'postgresql://ram:ram@ram-postgis:5432/ram'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
@@ -61,23 +70,26 @@ default:
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
             VT_SERVICE: hyper
             VT_CONTAINER: wbtransport/ram-vt:v0.1.0
-          commands:
-            - node
-            - index.js
-        ram-postgis:
-          image: mdillon/postgis
-          memory: 1000 # defaults to 256mb
-          ports:
-            - host: 5432
-              container: 5432
-              protocol: tcp
-          mount:
-            volume: pos
-            destination: /var/lib/postgresql/data
-          envs:
-            POSTGRES_DB: ram
-            POSTGRES_PASSWORD: ram
-            POSTGRES_USER: ram
+            # uncomment this part if a docker container is used as db 
+            # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
+          # links:
+            # - ram-postgis
+        
+        # uncomment this part only if you are not going to use RDS
+        # ram-postgis:
+        #   image: mdillon/postgis
+        #   memory: 500 # defaults to 256mb
+        #   ports:
+        #     - host: 5432
+        #       container: 5432
+        #       protocol: tcp
+        #   mount:
+        #     volume: pos
+        #     destination: /var/lib/postgresql/data
+        #   envs:
+        #     POSTGRES_DB: ram
+        #     POSTGRES_PASSWORD: {{DB_PASSWORD}}
+        #     POSTGRES_USER: ram
     ramFrontend:
       count: 1
       networkMode: null
@@ -91,11 +103,11 @@ default:
             - host: 80
               container: 80
               protocol: tcp
-          apiMachine: api # name of the EC2 machine that the API is hosted on
+          apiMachine: api # name of the EC2 machine that the API is hosted on. Is used to set the machine's IP as the API address
           envs:
             MBTOKEN: '{{MB_TOKEN}}'
   tags:
-    project: ruralroads
+    Project: ruralroads
 
 ds-staging:
   stackName: ram-staging-deploy-cf
