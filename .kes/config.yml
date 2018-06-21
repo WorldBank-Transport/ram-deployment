@@ -1,6 +1,6 @@
 default:
-  stackName: ram-deploy-cf
-  bucket: ram-cf-bucket 
+  stackName: ram-demo-test-cf
+  bucket: ram-demo-test
   capabilities:
     - CAPABILITY_NAMED_IAM
 
@@ -10,9 +10,9 @@ default:
 
   rds:
     type: db.t2.small
-    username: rra
+    username: ram
     password: '{{DB_PASSWORD}}'
-    dbName: rra
+    dbName: ram
     engine: postgres
     version: '9.6.8'
     storage: 20
@@ -21,7 +21,7 @@ default:
   ecs:
     publicIp: true # whether the ec2 instance have public IP addresses
     availabilityZone: us-east-1f # IMPORTANT: subnet and availability zone must be in the same zone
-    amiid: ami-5253c32d	 # which ec2 AMI to use for the ec2 instances
+    amiid: ami-aff65ad2	 # which ec2 AMI to use for the ec2 instances
     keyPairName: ruralroads # the ssh key to use for login into instance
     # only uncomment this if autoscaling ec2 support is needed
     # autoscaling:
@@ -31,21 +31,24 @@ default:
     #   desiredInstances: 0
     ec2:
       api:
-        instanceType: t2.small # size of the ec2 instance
+        instanceType: t2.medium # size of the ec2 instance
         volumeSize: 30
+      frontend:
+        instanceType: t2.micro
+        volumeSize: 8
 
   taskDefinitions:
-    ram:
-      count: 0 
+    ramApi:
+      count: 1
       networkMode: null
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
       containers:
         ram-api:
-          image: wbtransport/rra-api:latest-dev
+          image: wbtransport/ram-backend:v0.5.0
           #cpu: 10 # this is an optional key
-          memory: 500 # defaults to 256mb
+          memory: 2500 # defaults to 256mb
           ports:
             - host: 80
               container: 4000 
@@ -53,11 +56,10 @@ default:
           commands:
             - node
             - index.js
-          includeRds: true # set to true if RDS is used
+          includeRds: true # set to true if RDS is used. ANL_DB and DB_CONNECTION will both be set automatically
           envs:
-            ANL_CONTAINER: wbtransport/rra-analysis:latest-dev
+            ANL_CONTAINER: wbtransport/ram-analysis:v0.1.0
             ANL_SERVICE: hyper
-            ANL_DB: 'postgresql://rra:rra@{{ANL_IP_ADDRESS}}:5432/rra'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
@@ -67,8 +69,7 @@ default:
             STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
             VT_SERVICE: hyper
-            VT_CONTAINER: wbtransport/rra-vt:latest-stable
-
+            VT_CONTAINER: wbtransport/ram-vt:v0.1.0
             # uncomment this part if a docker container is used as db 
             # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
           # links:
@@ -86,15 +87,31 @@ default:
         #     volume: pos
         #     destination: /var/lib/postgresql/data
         #   envs:
-        #     POSTGRES_DB: rra
-        #     POSTGRES_PASSWORD: rra
-        #     POSTGRES_USER: rra
-
+        #     POSTGRES_DB: ram
+        #     POSTGRES_PASSWORD: {{DB_PASSWORD}}
+        #     POSTGRES_USER: ram
+    ramFrontend:
+      count: 1
+      networkMode: null
+      volume:
+        name: pos
+        path: /var/lib/postgresql/data # this is the path on the source machine
+      containers:
+        ram-frontend:
+          image: wbtransport/ram-frontend:v0.6.0
+          ports:
+            - host: 80
+              container: 80
+              protocol: tcp
+          apiMachine: api # name of the EC2 machine that the API is hosted on. Is used to set the machine's IP as the API address
+          envs:
+            MBTOKEN: '{{MB_TOKEN}}'
   tags:
-    project: ruralroads
+    Project: ruralroads
 
 ds-staging:
   stackName: ram-staging-deploy-cf
 
-aj-staging:
-  stackName: aj-ram-staging
+ram-demo:
+  stackName: ram-demo-cf
+  bucket: ram-demo
