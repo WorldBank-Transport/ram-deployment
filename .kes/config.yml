@@ -56,17 +56,12 @@ default:
           commands:
             - node
             - index.js
-          includeRds: true # set to true if RDS is used. ANL_DB and DB_CONNECTION will both be set automatically
+          includeRds: true # set to true if RDS is used. DB_CONNECTION will be set automatically
           envs:
-            ANL_CONTAINER: wbtransport/ram-analysis:latest
-            ANL_SERVICE: hyper
             CLUSTER_NAME: '{{stackName}}'
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
             ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
             DS_ENV: staging
-            HYPER_ACCESS: '{{HYPER_ACCESS}}'
-            HYPER_SECRET: '{{HYPER_SECRET}}'
-            HYPER_SIZE: L3
             INSTANCE_ID:
             RAH_GH_REPO: 'WorldBank-Transport/rah'
             RAH_GH_TOKEN: '{{RAH_GH_TOKEN}}'
@@ -80,8 +75,6 @@ default:
             STORAGE_REGION: '{{STORAGE_REGION}}'
             STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
             STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
-            VT_SERVICE: hyper
-            VT_CONTAINER: wbtransport/ram-vt:latest
             # uncomment this part if a docker container is used as db 
             # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
           # links:
@@ -125,7 +118,7 @@ default:
       containers:
         ram-analysis:
           image: wbtransport/ram-analysis:latest
-          includeRds: true # set to true if RDS is used. ANL_DB and DB_CONNECTION will both be set automatically
+          includeRds: true # set to true if RDS is used. DB_CONNECTION will be set automatically
           envs:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
