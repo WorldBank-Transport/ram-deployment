@@ -58,11 +58,11 @@ default:
             - index.js
           includeRds: true # set to true if RDS is used. DB_CONNECTION will be set automatically
           envs:
+            INSTANCE_ID:
+            DS_ENV: staging
             CLUSTER_NAME: '{{stackName}}'
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
             ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
-            DS_ENV: staging
-            INSTANCE_ID:
             RAH_GH_REPO: 'WorldBank-Transport/rah'
             RAH_GH_TOKEN: '{{RAH_GH_TOKEN}}'
             RAH_GH_PATH: 'app/assets/content/projects'
