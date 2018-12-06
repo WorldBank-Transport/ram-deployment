@@ -73,8 +73,6 @@ default:
             # RAH_AEMAIL: ''
             STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
             STORAGE_REGION: '{{STORAGE_REGION}}'
-            STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
-            STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
             # uncomment this part if a docker container is used as db 
             # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
           # links:
@@ -123,8 +121,6 @@ default:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
             STORAGE_REGION: '{{STORAGE_REGION}}'
-            STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
-            STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
     ramVectorTiles:
       count: 0
       networkMode: null
@@ -135,8 +131,6 @@ default:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
             STORAGE_REGION: '{{STORAGE_REGION}}'
-            STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
-            STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
   tags:
     Project: ruralroads
 
