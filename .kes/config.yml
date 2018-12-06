@@ -21,7 +21,7 @@ default:
   ecs:
     publicIp: true # whether the ec2 instance have public IP addresses
     availabilityZone: us-east-1f # IMPORTANT: subnet and availability zone must be in the same zone
-    amiid: ami-aff65ad2	 # which ec2 AMI to use for the ec2 instances
+    amiid: ami-aff65ad2 # which ec2 AMI to use for the ec2 instances
     keyPairName: ruralroads # the ssh key to use for login into instance
     # only uncomment this if autoscaling ec2 support is needed
     # autoscaling:
@@ -116,6 +116,31 @@ default:
           envs:
             MBTOKEN: '{{MB_TOKEN}}'
             RAH_URL: 'http://hub.ruralaccess.info'
+    ramAnalysis:
+      count: 0
+      networkMode: null
+      containers:
+        ram-analysis:
+          image: wbtransport/ram-analysis:latest
+          includeRds: true # set to true if RDS is used. ANL_DB and DB_CONNECTION will both be set automatically
+          envs:
+            STORAGE_ENGINE: s3
+            STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
+            STORAGE_REGION: '{{STORAGE_REGION}}'
+            STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
+            STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
+    ramVectorTiles:
+      count: 0
+      networkMode: null
+      containers:
+        ram-vt:
+          image: wbtransport/ram-vt:latest
+          envs:
+            STORAGE_ENGINE: s3
+            STORAGE_BUCKET: '{{STORAGE_BUCKET}}'
+            STORAGE_REGION: '{{STORAGE_REGION}}'
+            STORAGE_ACCESS_KEY: '{{STORAGE_ACCESS_KEY}}'
+            STORAGE_SECRET_KEY: '{{STORAGE_SECRET_KEY}}'
   tags:
     Project: ruralroads
 
