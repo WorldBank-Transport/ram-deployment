@@ -310,10 +310,12 @@ Resources:
   {{@key}}TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      {{# if this.volume }}
       Volumes:
         - Name: {{this.volume.name}}
           Host:
             SourcePath: {{this.volume.path}} 
+      {{/if}}
       {{# if this.networkMode }}
       NetworkMode: {{this.networkMode}}
       {{/if}}

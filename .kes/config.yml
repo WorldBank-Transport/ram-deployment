@@ -60,7 +60,7 @@ default:
           envs:
             INSTANCE_ID:
             DS_ENV: staging
-            CLUSTER_NAME: '{{stackName}}'
+            CLUSTER: '!Ref ECSCluster'
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
             ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
             RAH_GH_REPO: 'WorldBank-Transport/rah'
@@ -96,9 +96,6 @@ default:
     ramFrontend:
       count: 1
       networkMode: null
-      volume:
-        name: pos
-        path: /var/lib/postgresql/data # this is the path on the source machine
       containers:
         ram-frontend:
           image: wbtransport/ram-frontend:latest
