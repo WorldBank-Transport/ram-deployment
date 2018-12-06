@@ -60,6 +60,9 @@ default:
           envs:
             ANL_CONTAINER: wbtransport/ram-analysis:latest
             ANL_SERVICE: hyper
+            CLUSTER_NAME: '{{stackName}}'
+            VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
+            ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
             DS_ENV: staging
             HYPER_ACCESS: '{{HYPER_ACCESS}}'
             HYPER_SECRET: '{{HYPER_SECRET}}'
