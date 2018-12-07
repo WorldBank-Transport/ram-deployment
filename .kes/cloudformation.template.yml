@@ -353,7 +353,7 @@ Resources:
         {{#if this.envs}}
           Environment:
           {{# if this.includeRds}}
-            - Name: DB_CONNECTION 
+            - Name: DB_URI
               Value: 
                 Fn::Join:
                   - ""

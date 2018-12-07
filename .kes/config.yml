@@ -56,7 +56,7 @@ default:
           commands:
             - node
             - index.js
-          includeRds: true # set to true if RDS is used. DB_CONNECTION will be set automatically
+          includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
             INSTANCE_ID:
             DS_ENV: staging
@@ -113,7 +113,7 @@ default:
       containers:
         ram-analysis:
           image: wbtransport/ram-analysis:latest
-          includeRds: true # set to true if RDS is used. DB_CONNECTION will be set automatically
+          includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '{{bucket}}'
