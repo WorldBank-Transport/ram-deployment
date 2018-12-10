@@ -63,6 +63,58 @@ Resources:
                   - arn:aws:s3:::{{bucket}}
                   - arn:aws:s3:::{{bucket}}/*
 
+  FargateRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: {{stackName}}-fargate
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: ECSRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:GetMetricStatistics
+                  - ecs:DeregisterContainerInstance
+                  - ecs:DescribeClusters
+                  - ecs:DescribeContainerInstances
+                  - ecs:DescribeServices
+                  - ecs:DiscoverPollEndpoint
+                  - ecs:ListContainerInstances
+                  - ecs:ListServices
+                  - ecs:ListTaskDefinitions
+                  - ecs:ListTasks
+                  - ecs:Poll
+                  - ecs:RegisterContainerInstance
+                  - ecs:RunTask
+                  - ecs:StartTelemetrySession
+                  - ecs:Submit*
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Resource: "*"
+
+              # Allow writing to ingest buckets
+              - Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:Get*
+                  - s3:Put*
+                  - s3:List*
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                Resource:
+                  - arn:aws:s3:::{{bucket}}
+                  - arn:aws:s3:::{{bucket}}/*
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -310,15 +362,26 @@ Resources:
   {{@key}}TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      {{# if this.volume }}
+      {{#if this.volume}}
       Volumes:
         - Name: {{this.volume.name}}
           Host:
             SourcePath: {{this.volume.path}} 
       {{/if}}
-      {{# if this.networkMode }}
+      {{#if this.networkMode}}
       NetworkMode: {{this.networkMode}}
       {{/if}}
+      {{#ifEquals this.taskType 'FARGATE'}}
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      TaskRoleArn:
+        Ref: FargateRole
+      ExecutionRoleArn:
+        Ref: FargateRole
+      Cpu: {{this.cpu}}
+      Memory: {{this.memory}}
+      {{/ifEquals}}
     {{#if this.placementConstraints }}
       PlacementConstraints:
         - type: {{this.placementConstraints.type}}
@@ -329,7 +392,6 @@ Resources:
       ContainerDefinitions:
       {{#each this.containers}}
         - Name: {{@key}}
-          Cpu: {{#if this.cpu }}{{ this.cpu }}{{ else }}10{{/if}}
           Essential: true
           {{#if this.mount}}
           MountPoints:
@@ -379,7 +441,10 @@ Resources:
           {{/each}}
         {{/if}}
           Image: {{this.image}}
+          {{#ifEquals ../this.taskType FARGATE}}
+          Cpu: {{#if this.cpu }}{{ this.cpu }}{{ else }}10{{/if}}
           MemoryReservation: {{#if this.memory }}{{ this.memory }}{{ else }}256{{/if}}
+          {{/ifEquals}}
       {{# if this.commands }}
           Command:
         {{# each this.commands }}
@@ -393,6 +458,7 @@ Resources:
                 Ref: {{@../key}}EcsLogs
               awslogs-region:
                 Fn::Sub: ${AWS::Region}
+              awslogs-stream-prefix: ecs
       {{/each}}
 
   {{@key}}EcsLogs:
@@ -411,6 +477,18 @@ Resources:
       DeploymentConfiguration:
         MaximumPercent: 100
         MinimumHealthyPercent: 0 
+      {{#ifEquals this.taskType 'FARGATE'}}
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+              - SecurityGroup
+              - GroupId
+          Subnets:
+            - {{../vpc.subnet}}
+      {{/ifEquals}}
 {{/each}}
 
   #################################################

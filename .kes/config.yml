@@ -1,5 +1,5 @@
 default:
-  stackName: ram-demo-test-cf
+  stackName: ram-demo-test-cf-3
   bucket: ram-demo-test
   capabilities:
     - CAPABILITY_NAMED_IAM
@@ -40,15 +40,14 @@ default:
   taskDefinitions:
     ramApi:
       count: 1
-      networkMode: null
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
       containers:
         ram-api:
-          image: wbtransport/ram-backend:latest
+          image: wbtransport/ram-backend:latest-dev
           #cpu: 10 # this is an optional key
-          memory: 2500 # defaults to 256mb
+          memory: 2000 # defaults to 256mb
           ports:
             - host: 80
               container: 4000 
@@ -58,7 +57,7 @@ default:
             - index.js
           includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
-            INSTANCE_ID:
+            INSTANCE_ID: ram-aws-test
             DS_ENV: staging
             CLUSTER: '!Ref ECSCluster'
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
@@ -95,10 +94,9 @@ default:
         #     POSTGRES_USER: ram
     ramFrontend:
       count: 1
-      networkMode: null
       containers:
         ram-frontend:
-          image: wbtransport/ram-frontend:latest
+          image: wbtransport/ram-frontend:latest-dev
           ports:
             - host: 80
               container: 80
@@ -109,10 +107,12 @@ default:
             RAH_URL: 'http://hub.ruralaccess.info'
     ramAnalysis:
       count: 0
-      networkMode: null
+      taskType: FARGATE
+      cpu: 2048 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+      memory: 6GB
       containers:
         ram-analysis:
-          image: wbtransport/ram-analysis:latest
+          image: wbtransport/ram-analysis:latest-dev
           includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
             STORAGE_ENGINE: s3
@@ -120,10 +120,12 @@ default:
             STORAGE_REGION: '{{ecs.availabilityZone}}'
     ramVectorTiles:
       count: 0
-      networkMode: null
+      taskType: FARGATE
+      cpu: 2048 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+      memory: 6GB
       containers:
         ram-vt:
-          image: wbtransport/ram-vt:latest
+          image: wbtransport/ram-vt:latest-dev
           envs:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '{{bucket}}'
