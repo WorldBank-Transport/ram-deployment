@@ -346,6 +346,14 @@ Resources:
             - Name: {{@key}}
               Value: {{this}}
           {{/each}}
+            - Name: AWS_CLUSTER
+              Value: !Ref ECSCluster
+            - Name: AWS_SUBNET
+              Value: {{../../vpc.subnet}}
+            - Name: AWS_SEC_GROUP
+              Value: !Ref SecurityGroup
+            - Name: AWS_LOG_STREAM_PREFIX
+              Value: ecs
         {{/if}}
           Image: {{this.image}}
           {{#ifEquals ../this.taskType FARGATE}}

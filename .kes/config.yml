@@ -53,9 +53,6 @@ default:
           envs:
             INSTANCE_ID: ram-aws-test
             DS_ENV: staging
-            CLUSTER: '!Ref ECSCluster'
-            VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
-            ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
             RAH_GH_REPO: 'WorldBank-Transport/rah'
             RAH_GH_TOKEN: '{{RAH_GH_TOKEN}}'
             RAH_GH_PATH: 'app/assets/content/projects'
@@ -66,6 +63,11 @@ default:
             # RAH_AEMAIL: ''
             STORAGE_BUCKET: '{{bucket}}'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
+            # environment variables the backend needs to spin up Fargate containers
+            VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
+            VT_AWS_LOG_GROUP: '!Ref ramVectorTilesEcsLogs'
+            ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
+            ANL_AWS_LOG_GROUP: '!Ref ramAnalysisEcsLogs'
 
     ramFrontend:
       count: 1
@@ -80,6 +82,7 @@ default:
           envs:
             MBTOKEN: '{{MB_TOKEN}}'
             RAH_URL: 'http://hub.ruralaccess.info'
+
     ramAnalysis:
       count: 0
       taskType: FARGATE
