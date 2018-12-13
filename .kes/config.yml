@@ -23,12 +23,6 @@ default:
     availabilityZone: us-east-1f # IMPORTANT: subnet and availability zone must be in the same zone
     amiid: ami-aff65ad2 # which ec2 AMI to use for the ec2 instances
     keyPairName: ruralroads # the ssh key to use for login into instance
-    # only uncomment this if autoscaling ec2 support is needed
-    # autoscaling:
-    #   instanceType: t2.small # size of the ec2 instance
-    #   volumeSize: 30 # the size of the storage on the ec2 instance
-    #   maxInstances: 0
-    #   desiredInstances: 0
     ec2:
       api:
         instanceType: t2.medium # size of the ec2 instance
@@ -72,26 +66,7 @@ default:
             # RAH_AEMAIL: ''
             STORAGE_BUCKET: '{{bucket}}'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
-            # uncomment this part if a docker container is used as db 
-            # DB_CONNECTION: 'postgresql://rra:rra@ram-postgis:5432/rra'
-          # links:
-            # - ram-postgis
-        
-        # uncomment this part only if you are not going to use RDS
-        # ram-postgis:
-        #   image: mdillon/postgis
-        #   memory: 500 # defaults to 256mb
-        #   ports:
-        #     - host: 5432
-        #       container: 5432
-        #       protocol: tcp
-        #   mount:
-        #     volume: pos
-        #     destination: /var/lib/postgresql/data
-        #   envs:
-        #     POSTGRES_DB: ram
-        #     POSTGRES_PASSWORD: {{DB_PASSWORD}}
-        #     POSTGRES_USER: ram
+
     ramFrontend:
       count: 1
       containers:
