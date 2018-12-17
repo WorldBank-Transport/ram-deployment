@@ -1,6 +1,6 @@
 default:
   stackName: ram-demo-test-cf-4
-  bucket: ram-demo-test
+  bucket: ram-demo-test # bucket with the CF config. Has to exist prior to deploying a stack
   capabilities:
     - CAPABILITY_NAMED_IAM
 
@@ -16,6 +16,10 @@ default:
     engine: postgres
     version: '9.6.8'
     storage: 20
+
+  s3:
+    fileStorage:
+      name: 'ram-filestorage-{{stackName}}'
 
   # instances created by this config are configured to work with ECS service
   ecs:
@@ -50,7 +54,7 @@ default:
             - index.js
           includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
-            INSTANCE_ID: ram-aws-test
+            INSTANCE_ID: '{{stackName}}'
             DS_ENV: staging
             RAH_GH_REPO: 'WorldBank-Transport/rah'
             RAH_GH_TOKEN: '{{RAH_GH_TOKEN}}'
@@ -60,7 +64,8 @@ default:
             # RAH_CEMAIL: ''
             # RAH_ANAME: ''
             # RAH_AEMAIL: ''
-            STORAGE_BUCKET: '{{bucket}}'
+            STORAGE_ENGINE: s3
+            STORAGE_BUCKET: '!Ref fileStorageS3'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
             # environment variables the backend needs to spin up Fargate containers
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
@@ -94,7 +99,7 @@ default:
           includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
             STORAGE_ENGINE: s3
-            STORAGE_BUCKET: '{{bucket}}'
+            STORAGE_BUCKET: '!Ref fileStorageS3'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
     ramVectorTiles:
       count: 0
@@ -106,7 +111,7 @@ default:
           image: wbtransport/ram-vt:latest-dev
           envs:
             STORAGE_ENGINE: s3
-            STORAGE_BUCKET: '{{bucket}}'
+            STORAGE_BUCKET: '!Ref fileStorageS3'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
   tags:
     Project: ruralroads

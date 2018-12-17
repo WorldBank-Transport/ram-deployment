@@ -60,8 +60,13 @@ Resources:
                   - s3:DeleteObject
                   - s3:DeleteObjectVersion
                 Resource:
-                  - arn:aws:s3:::{{bucket}}
-                  - arn:aws:s3:::{{bucket}}/*
+                  {{#if s3}}
+                  {{# each s3}}
+                  - arn:aws:s3:::{{this.name}}
+                  - arn:aws:s3:::{{this.name}}/*
+                  {{/each}}
+                  {{/if}}
+
 
   FargateRole:
     Type: AWS::IAM::Role
@@ -113,8 +118,12 @@ Resources:
                   - s3:DeleteObject
                   - s3:DeleteObjectVersion
                 Resource:
-                  - arn:aws:s3:::{{bucket}}
-                  - arn:aws:s3:::{{bucket}}/*
+                  {{#if s3}}
+                  {{# each s3}}
+                  - arn:aws:s3:::{{this.name}}
+                  - arn:aws:s3:::{{this.name}}/*
+                  {{/each}}
+                  {{/if}}
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -208,6 +217,32 @@ Resources:
 
   #################################################
   # ECS config END
+  #################################################
+
+  #################################################
+  # S3 BEGIN
+  #################################################
+
+{{#if s3}}
+  {{# each s3}}
+  {{@key}}S3:
+    Type: AWS::S3::Bucket
+    Properties:
+      {{#if this.name}}
+      BucketName: {{this.name}}
+      {{/if}}
+      {{#if ../tags}}
+      Tags:
+        {{#each ../tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+      {{/if}}
+  {{/each}}
+{{/if}}
+
+  #################################################
+  # S3 END
   #################################################
 
   #################################################
