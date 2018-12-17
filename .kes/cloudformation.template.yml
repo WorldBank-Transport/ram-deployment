@@ -190,6 +190,12 @@ Resources:
           Value: "{{../stackName}}-{{@key}}"
         - Key: Stack
           Value: {{../stackName}}
+        {{#if ../tags}}
+        {{#each ../tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+        {{/if}}
 
   {{@key}}Ec2Volume:
     Type: "AWS::EC2::Volume"
@@ -253,6 +259,12 @@ Resources:
       Tags:
         - Key: Name
           Value: "{{stackName}}-postgres"
+        {{#if tags}}
+        {{#each tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+        {{/if}}
 {{/if}}
 
 
