@@ -278,6 +278,11 @@ Resources:
       {{#if this.networkMode}}
       NetworkMode: {{this.networkMode}}
       {{/if}}
+      {{#if this.placeOn}}
+      PlacementConstraints:
+        - Type: memberOf
+          Expression: attribute:ecs.instance-type == {{this.placeOn}}
+      {{/if}}
       {{#ifEquals this.taskType 'FARGATE'}}
       RequiresCompatibilities:
         - FARGATE

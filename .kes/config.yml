@@ -1,5 +1,5 @@
 default:
-  stackName: ram-demo-test-cf-3
+  stackName: ram-demo-test-cf-4
   bucket: ram-demo-test
   capabilities:
     - CAPABILITY_NAMED_IAM
@@ -37,11 +37,10 @@ default:
       volume:
         name: pos
         path: /var/lib/postgresql/data # this is the path on the source machine
+      placeOn: t2.medium # refers to one of the ec2 machine in the ecs.ec2 section
       containers:
         ram-api:
           image: wbtransport/ram-backend:latest-dev
-          #cpu: 10 # this is an optional key
-          memory: 2000 # defaults to 256mb
           ports:
             - host: 80
               container: 4000 
@@ -71,6 +70,7 @@ default:
 
     ramFrontend:
       count: 1
+      placeOn: t2.micro
       containers:
         ram-frontend:
           image: wbtransport/ram-frontend:latest-dev
