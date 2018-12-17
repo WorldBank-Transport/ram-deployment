@@ -86,8 +86,8 @@ default:
     ramAnalysis:
       count: 0
       taskType: FARGATE
-      cpu: 2048 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
-      memory: 6GB
+      cpu: 256 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+      memory: 1GB
       containers:
         ram-analysis:
           image: wbtransport/ram-analysis:latest-dev
@@ -99,8 +99,8 @@ default:
     ramVectorTiles:
       count: 0
       taskType: FARGATE
-      cpu: 2048 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
-      memory: 6GB
+      cpu: 256 # Cpu and Memory depend on each other - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html#cfn-ecs-taskdefinition-cpu
+      memory: 1GB
       containers:
         ram-vt:
           image: wbtransport/ram-vt:latest-dev
