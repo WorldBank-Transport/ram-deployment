@@ -48,6 +48,7 @@ Resources:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                   - logs:PutLogEvents
+                  - iam:PassRole
                 Resource: "*"
 
               # Allow writing to ingest buckets
