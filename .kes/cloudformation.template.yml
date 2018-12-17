@@ -370,16 +370,11 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-group:
-                Ref: {{@../key}}EcsLogs
+                Ref: CloudwatchLogsGroup
               awslogs-region:
                 Fn::Sub: ${AWS::Region}
               awslogs-stream-prefix: ecs
       {{/each}}
-
-  {{@key}}EcsLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: {{../stackName}}-{{@key}}EcsLogs
 
   {{@key}}ECSService:
     Type: AWS::ECS::Service
@@ -410,6 +405,11 @@ Resources:
   # TaskDefinition END 
   #################################################
 
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: {{stackName}}-logs
+      RetentionInDays: 30
 
 {{# if ecs.ec2}}
 Outputs:

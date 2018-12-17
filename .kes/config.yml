@@ -65,9 +65,9 @@ default:
             STORAGE_REGION: '{{ecs.availabilityZone}}'
             # environment variables the backend needs to spin up Fargate containers
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
-            VT_AWS_LOG_GROUP: '!Ref ramVectorTilesEcsLogs'
+            VT_AWS_LOG_GROUP: '!Ref CloudwatchLogsGroup'
             ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
-            ANL_AWS_LOG_GROUP: '!Ref ramAnalysisEcsLogs'
+            ANL_AWS_LOG_GROUP: '!Ref CloudwatchLogsGroup'
 
     ramFrontend:
       count: 1
