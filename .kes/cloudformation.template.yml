@@ -42,11 +42,14 @@ Resources:
                   - ecs:Poll
                   - ecs:RegisterContainerInstance
                   - ecs:RunTask
+                  - ecs:StopTask
+                  - ecs:DescribeTasks
                   - ecs:StartTelemetrySession
                   - ecs:Submit*
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
+                  - logs:GetLogEvents
                   - logs:PutLogEvents
                   - iam:PassRole
                 Resource: "*"

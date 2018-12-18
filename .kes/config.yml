@@ -70,8 +70,10 @@ default:
             # environment variables the backend needs to spin up Fargate containers
             VT_TASK_DEF: '!Ref ramVectorTilesTaskDefinition'
             VT_AWS_LOG_GROUP: '!Ref CloudwatchLogsGroup'
+            VT_SERVICE: aws
             ANL_TASK_DEF: '!Ref ramAnalysisTaskDefinition'
             ANL_AWS_LOG_GROUP: '!Ref CloudwatchLogsGroup'
+            ANL_SERVICE: aws
 
     ramFrontend:
       count: 1
