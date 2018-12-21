@@ -42,6 +42,68 @@ Resources:
                   - ecs:Poll
                   - ecs:RegisterContainerInstance
                   - ecs:RunTask
+                  - ecs:StopTask
+                  - ecs:DescribeTasks
+                  - ecs:StartTelemetrySession
+                  - ecs:Submit*
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:GetLogEvents
+                  - logs:PutLogEvents
+                  - iam:PassRole
+                Resource: "*"
+
+              # Allow writing to ingest buckets
+              - Effect: Allow
+                Action:
+                  - s3:AbortMultipartUpload
+                  - s3:Get*
+                  - s3:Put*
+                  - s3:List*
+                  - s3:DeleteObject
+                  - s3:DeleteObjectVersion
+                Resource:
+                  {{#if s3}}
+                  {{# each s3}}
+                  - arn:aws:s3:::{{this.name}}
+                  - arn:aws:s3:::{{this.name}}/*
+                  {{/each}}
+                  {{/if}}
+
+
+  FargateRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: {{stackName}}-fargate
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: ECSRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:GetMetricStatistics
+                  - ecs:DeregisterContainerInstance
+                  - ecs:DescribeClusters
+                  - ecs:DescribeContainerInstances
+                  - ecs:DescribeServices
+                  - ecs:DiscoverPollEndpoint
+                  - ecs:ListContainerInstances
+                  - ecs:ListServices
+                  - ecs:ListTaskDefinitions
+                  - ecs:ListTasks
+                  - ecs:Poll
+                  - ecs:RegisterContainerInstance
+                  - ecs:RunTask
                   - ecs:StartTelemetrySession
                   - ecs:Submit*
                   - logs:CreateLogGroup
@@ -60,9 +122,12 @@ Resources:
                   - s3:DeleteObject
                   - s3:DeleteObjectVersion
                 Resource:
-                  - arn:aws:s3:::{{bucket}}
-                  - arn:aws:s3:::{{bucket}}/*
-
+                  {{#if s3}}
+                  {{# each s3}}
+                  - arn:aws:s3:::{{this.name}}
+                  - arn:aws:s3:::{{this.name}}/*
+                  {{/each}}
+                  {{/if}}
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -138,6 +203,12 @@ Resources:
           Value: "{{../stackName}}-{{@key}}"
         - Key: Stack
           Value: {{../stackName}}
+        {{#if ../tags}}
+        {{#each ../tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+        {{/if}}
 
   {{@key}}Ec2Volume:
     Type: "AWS::EC2::Volume"
@@ -148,101 +219,34 @@ Resources:
   {{/each}}
 {{/if}}
 
-{{# if ecs.autoscaling}}
-  ContainerInstanceLaunch:
-    Type: AWS::AutoScaling::LaunchConfiguration
-    Metadata:
-      AWS::CloudFormation::Init:
-        config:
-          commands:
-            01_add_instance_to_cluster:
-              command: 
-                Fn::Sub: |
-                  #!/bin/bash
-                  echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-                  
-          files:
-            "/etc/cfn/cfn-hup.conf":
-              content:
-                Fn::Sub: |
-                  [main]
-                  stack=${AWS::StackId}
-                  region=${AWS::Region}
-              mode: '000400'
-              owner: root
-              group: root
-            "/etc/cfn/hooks.d/cfn-auto-reloader.conf":
-              content:
-                Fn::Sub: |
-                  [cfn-auto-reloader-hook]
-                  triggers=post.update
-                  path=Resources.ContainerInstanceLaunch.Metadata.AWS::CloudFormation::Init
-                  action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource ContainerInstanceLaunch --region ${AWS::Region}
-                  runas=root
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: 'true'
-                ensureRunning: 'true'
-                files:
-                - "/etc/cfn/cfn-hup.conf"
-                - "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
-    Properties:
-    {{# if vpc.subnets }}
-      AssociatePublicIpAddress: {{#if ecs.publicIp}}{{ecs.publicIp}}{{else}}false{{/if}}
-    {{/if}}
-      SecurityGroups:
-        - Fn::GetAtt:
-          - SecurityGroup
-          - GroupId
-      ImageId: {{ecs.amiid}}
-      InstanceType: {{ecs.autoscaling.instanceType}}
-      IamInstanceProfile:
-        Fn::GetAtt:
-          - InstanceProfile
-          - Arn
-      BlockDeviceMappings:
-      - DeviceName: "/dev/xvda"
-        Ebs:
-          DeleteOnTermination: true
-          VolumeSize: {{ecs.autoscaling.volumeSize}}
-    {{# if ecs.keyPairName }}
-      KeyName: {{ ecs.keyPairName }}
-    {{/if}}
-      UserData:
-        "Fn::Base64":
-          Fn::Join:
-            - ""
-            - - "#cloud-config\n"
-              - "\nruncmd:\n"
-              - " - yum install -y aws-cfn-bootstrap\n"
-              - Fn::Sub: " - /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource ContainerInstanceLaunch --region ${AWS::Region}\n"
-              - Fn::Sub: " - /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource ECSAutoScalingGroup --region ${AWS::Region}"
+  #################################################
+  # ECS config END
+  #################################################
 
+  #################################################
+  # S3 BEGIN
+  #################################################
 
-  ECSAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    UpdatePolicy:
-      AutoScalingRollingUpdate:
-        MinInstancesInService: 0
+{{#if s3}}
+  {{# each s3}}
+  {{@key}}S3:
+    Type: AWS::S3::Bucket
     Properties:
-      AvailabilityZones:
-        - {{ecs.availabilityZone}}
-      VPCZoneIdentifier:
-        - {{vpc.subnet}}
-      LaunchConfigurationName:
-        Ref: ContainerInstanceLaunch
-      MinSize: '0'
-      MaxSize: {{ ecs.autoscaling.maxInstances }}
-      DesiredCapacity: {{ ecs.autoscaling.desiredInstances }}
+      {{#if this.name}}
+      BucketName: {{this.name}}
+      {{/if}}
+      {{#if ../tags}}
       Tags:
-      - Key: Name
-        Value: "{{stackName}}-ecs"
-        PropagateAtLaunch: true
+        {{#each ../tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+      {{/if}}
+  {{/each}}
 {{/if}}
 
   #################################################
-  # ECS config END
+  # S3 END
   #################################################
 
   #################################################
@@ -294,6 +298,12 @@ Resources:
       Tags:
         - Key: Name
           Value: "{{stackName}}-postgres"
+        {{#if tags}}
+        {{#each tags}}
+        - Key: {{@key}}
+          Value: {{this}}
+        {{/each}}
+        {{/if}}
 {{/if}}
 
 
@@ -310,13 +320,31 @@ Resources:
   {{@key}}TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      {{#if this.volume}}
       Volumes:
         - Name: {{this.volume.name}}
           Host:
             SourcePath: {{this.volume.path}} 
-      {{# if this.networkMode }}
+      {{/if}}
+      {{#if this.networkMode}}
       NetworkMode: {{this.networkMode}}
       {{/if}}
+      {{#if this.placeOn}}
+      PlacementConstraints:
+        - Type: memberOf
+          Expression: attribute:ecs.instance-type == {{this.placeOn}}
+      {{/if}}
+      {{#ifEquals this.taskType 'FARGATE'}}
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      TaskRoleArn:
+        Ref: FargateRole
+      ExecutionRoleArn:
+        Ref: FargateRole
+      Cpu: {{this.cpu}}
+      Memory: {{this.memory}}
+      {{/ifEquals}}
     {{#if this.placementConstraints }}
       PlacementConstraints:
         - type: {{this.placementConstraints.type}}
@@ -327,7 +355,6 @@ Resources:
       ContainerDefinitions:
       {{#each this.containers}}
         - Name: {{@key}}
-          Cpu: {{#if this.cpu }}{{ this.cpu }}{{ else }}10{{/if}}
           Essential: true
           {{#if this.mount}}
           MountPoints:
@@ -351,16 +378,7 @@ Resources:
         {{#if this.envs}}
           Environment:
           {{# if this.includeRds}}
-            - Name: DB_CONNECTION 
-              Value: 
-                Fn::Join:
-                  - ""
-                  - - "postgresql://{{../../rds.username}}:{{../../rds.password}}@"
-                    - Fn::GetAtt:
-                        - RDS
-                        - Endpoint.Address
-                    - ":5432/{{../../rds.dbName}}"
-            - Name: ANL_DB 
+            - Name: DB_URI
               Value: 
                 Fn::Join:
                   - ""
@@ -384,9 +402,20 @@ Resources:
             - Name: {{@key}}
               Value: {{this}}
           {{/each}}
+            - Name: AWS_CLUSTER
+              Value: !Ref ECSCluster
+            - Name: AWS_SUBNET
+              Value: {{../../vpc.subnet}}
+            - Name: AWS_SEC_GROUP
+              Value: !Ref SecurityGroup
+            - Name: AWS_LOG_STREAM_PREFIX
+              Value: ecs
         {{/if}}
           Image: {{this.image}}
+          {{#ifEquals ../this.taskType FARGATE}}
+          Cpu: {{#if this.cpu }}{{ this.cpu }}{{ else }}10{{/if}}
           MemoryReservation: {{#if this.memory }}{{ this.memory }}{{ else }}256{{/if}}
+          {{/ifEquals}}
       {{# if this.commands }}
           Command:
         {{# each this.commands }}
@@ -397,15 +426,11 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-group:
-                Ref: {{@../key}}EcsLogs
+                Ref: CloudwatchLogsGroup
               awslogs-region:
                 Fn::Sub: ${AWS::Region}
+              awslogs-stream-prefix: ecs
       {{/each}}
-
-  {{@key}}EcsLogs:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: {{../stackName}}-{{@key}}EcsLogs
 
   {{@key}}ECSService:
     Type: AWS::ECS::Service
@@ -418,12 +443,29 @@ Resources:
       DeploymentConfiguration:
         MaximumPercent: 100
         MinimumHealthyPercent: 0 
+      {{#ifEquals this.taskType 'FARGATE'}}
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+              - SecurityGroup
+              - GroupId
+          Subnets:
+            - {{../vpc.subnet}}
+      {{/ifEquals}}
 {{/each}}
 
   #################################################
   # TaskDefinition END 
   #################################################
 
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: {{stackName}}-logs
+      RetentionInDays: 30
 
 {{# if ecs.ec2}}
 Outputs:
