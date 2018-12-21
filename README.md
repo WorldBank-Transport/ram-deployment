@@ -33,7 +33,7 @@ Follow these steps before deploying the first stack:
   * the key pair under `default.ecs.keyPairName`
 * Set the environment variables in `.kes/.env`
 
-This configuration is shared between different stacks. If you run multiple stack, you only have to do this once.
+This configuration is shared between different stacks. If you run multiple stacks, you only have to do this once.
 
 ## Deploying a stack
 To deploy a new stack:
@@ -45,11 +45,13 @@ The new stack will inherit all configuration from the default stack. It's possib
     stackName: ram-another-instance
   ```
 * run kes deploy  
-`./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1  --kes-class .kes/kes.js`.
-* setup initial DB structure  
-When deploying a stack for the first time, find the postgres connection string in the RDS interface. Add this to `local.js` of the `[ram-backend](https://github.com/WorldBank-Transport/ram-backend)` and run `yarn setup --db`
+  `$ ./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`
 
-Go to ECS console to find out the IP of the `frontend` machine. RAM will be accessible through that IP.
+Once the deploy finishes (which may take a while), Kes prints information about the stack. This includes IP addresses and the database connection string. Use this connection string to set up the database structure:
+
+```
+$ yarn setup --db postgres://your:own@connection:1234/string
+```
 
 ## Deleting a stack
 Deleting a stack will take all resources down, but keep the S3 bucket that was created by the stack for file storage. It can be manually deleted.

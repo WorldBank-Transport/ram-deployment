@@ -2,3 +2,4 @@ yarn.lock
 node_modules
 .env
 cloudformation.yml
+setup/config.js

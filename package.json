@@ -4,6 +4,7 @@
   "description": "RAM deployment with the CloudFormation",
   "main": "index.js",
   "scripts": {
+    "setup": "DEBUG=true node setup/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/developmentseed/ram-deployment#readme",
   "dependencies": {
-    "kes": "^2.2.6"
+    "kes": "^2.2.7",
+    "knex": "^0.16.3",
+    "pg": "^7.7.1"
   }
 }
