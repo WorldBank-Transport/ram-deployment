@@ -469,11 +469,15 @@ Resources:
 
 {{# if ecs.ec2}}
 Outputs:
-  rdsAddress:
+  dbConnectionString:
     Value:
-      Fn::GetAtt:
-        - RDS
-        - Endpoint.Address
+      Fn::Join:
+        - ""
+        - - "postgresql://{{rds.username}}:{{rds.password}}@"
+          - Fn::GetAtt:
+              - RDS
+              - Endpoint.Address
+          - ":5432/{{rds.dbName}}"
   {{# each ecs.ec2}}
   {{@key}}IpAddress:
     Value:

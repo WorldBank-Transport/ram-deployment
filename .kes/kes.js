@@ -5,12 +5,19 @@ class UpdatedKes extends Kes {
   opsStack() {
     return super.opsStack()
       .then(() => this.describeCF())
-      .then((r) => console.log(
-        `The stack ${r.Stacks[0].StackName} is deployed or updated. The main components are available through:
-  - frontend: ${r.Stacks[0].Outputs.find(o => o.OutputKey === 'frontendIpAddress')['OutputValue']}
-  - backend: ${r.Stacks[0].Outputs.find(o => o.OutputKey === 'apiIpAddress')['OutputValue']}
-  - database: ${r.Stacks[0].Outputs.find(o => o.OutputKey === 'rdsAddress')['OutputValue']}`
-      ))
+      .then((r) => {
+        let output = r.Stacks[0].Outputs
+        let frontendAddress = output.find(o => o.OutputKey === 'frontendIpAddress')['OutputValue']
+        let apiAddress = output.find(o => o.OutputKey === 'apiIpAddress')['OutputValue']
+        let dbConnection = output.find(o => o.OutputKey === 'dbConnectionString')['OutputValue']
+
+        return console.log(
+          `The stack ${r.Stacks[0].StackName} is deployed or updated. The main components are available through:
+  - frontend: ${frontendAddress}
+  - backend: ${apiAddress}
+  - db connection string: ${dbConnection}`
+      )
+    })
   }
 }
 
