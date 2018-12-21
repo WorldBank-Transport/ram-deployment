@@ -45,15 +45,13 @@ The new stack will inherit all configuration from the default stack. It's possib
     stackName: ram-another-instance
   ```
 * run kes deploy  
-`./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`.
+  `$ ./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`.
 
-After the initial deploy, set up the database structure:
+Once the deploy finishes (which may take a while), Kes will print useful information about the stack, including IP addresses of the interface and the database connection string. Use this connection string to set up the database structure:
 
-* find the Postgres connection string in the RDS interface
-* add this to `./setup/config.js`
-* run `yarn setup --db`
-
-Go to ECS console to find out the IP of the `frontend` machine. RAM will be accessible through that IP.
+```
+$ yarn setup --db postgres://your:own@connection:1234/string
+```
 
 ## Deleting a stack
 Deleting a stack will take all resources down, but keep the S3 bucket that was created by the stack for file storage. It can be manually deleted.
