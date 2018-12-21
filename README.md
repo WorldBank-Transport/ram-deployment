@@ -47,7 +47,7 @@ The new stack will inherit all configuration from the default stack. It's possib
 * run kes deploy  
 `./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`.
 * setup initial DB structure  
-When deploying a stack for the first time, find the postgres connection string in the RDS interface. Add this to `local.js` of the `[ram-backend](https://github.com/WorldBank-Transport/ram-backend)` and run `yarn run setup -- --db`
+When deploying a stack for the first time, find the postgres connection string in the RDS interface. Add this to `local.js` of the `[ram-backend](https://github.com/WorldBank-Transport/ram-backend)` and run `yarn setup --db`
 
 Go to ECS console to find out the IP of the `frontend` machine. RAM will be accessible through that IP.
 
