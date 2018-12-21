@@ -45,7 +45,7 @@ The new stack will inherit all configuration from the default stack. It's possib
     stackName: ram-another-instance
   ```
 * run kes deploy  
-`./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`.
+`./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1  --kes-class .kes/kes.js`.
 * setup initial DB structure  
 When deploying a stack for the first time, find the postgres connection string in the RDS interface. Add this to `local.js` of the `[ram-backend](https://github.com/WorldBank-Transport/ram-backend)` and run `yarn setup --db`
 

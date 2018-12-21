@@ -469,6 +469,11 @@ Resources:
 
 {{# if ecs.ec2}}
 Outputs:
+  rdsAddress:
+    Value:
+      Fn::GetAtt:
+        - RDS
+        - Endpoint.Address
   {{# each ecs.ec2}}
   {{@key}}IpAddress:
     Value:
