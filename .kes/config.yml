@@ -1,5 +1,5 @@
 default:
-  stackName: ram-demo-test-cf-4
+  stackName: ram-demo-test
   bucket: ram-demo-test # bucket with the CF config. Has to exist prior to deploying a stack
   capabilities:
     - CAPABILITY_NAMED_IAM
@@ -9,7 +9,7 @@ default:
     subnet: subnet-7945cb75
 
   rds:
-    type: db.t2.small
+    type: db.t2.medium
     username: ram
     password: '{{DB_PASSWORD}}'
     dbName: ram
@@ -44,7 +44,7 @@ default:
       placeOn: t2.medium # refers to one of the ec2 machine in the ecs.ec2 section
       containers:
         ram-api:
-          image: wbtransport/ram-backend:latest-dev
+          image: wbtransport/ram-backend:latest
           ports:
             - host: 80
               container: 4000 
@@ -80,7 +80,7 @@ default:
       placeOn: t2.micro
       containers:
         ram-frontend:
-          image: wbtransport/ram-frontend:latest-dev
+          image: wbtransport/ram-frontend:latest
           ports:
             - host: 80
               container: 80
@@ -97,7 +97,7 @@ default:
       memory: 4GB
       containers:
         ram-analysis:
-          image: wbtransport/ram-analysis:latest-dev
+          image: wbtransport/ram-analysis:latest
           includeRds: true # set to true if RDS is used. DB_URI will be set automatically
           envs:
             STORAGE_ENGINE: s3
@@ -110,17 +110,13 @@ default:
       memory: 1GB
       containers:
         ram-vt:
-          image: wbtransport/ram-vt:latest-dev
+          image: wbtransport/ram-vt:latest
           envs:
             STORAGE_ENGINE: s3
             STORAGE_BUCKET: '!Ref fileStorageS3'
             STORAGE_REGION: '{{ecs.availabilityZone}}'
   tags:
-    Project: ruralroads
+    Project: ram
 
-ds-staging:
-  stackName: ram-staging-deploy-cf
-
-ram-demo:
-  stackName: ram-demo-cf
-  bucket: ram-demo
+ram-another-instance:
+  stackName: ram-another-instance
