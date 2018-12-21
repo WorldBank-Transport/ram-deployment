@@ -33,7 +33,7 @@ Follow these steps before deploying the first stack:
   * the key pair under `default.ecs.keyPairName`
 * Set the environment variables in `.kes/.env`
 
-This configuration is shared between different stacks. If you run multiple stack, you only have to do this once.
+This configuration is shared between different stacks. If you run multiple stacks, you only have to do this once.
 
 ## Deploying a stack
 To deploy a new stack:
@@ -45,9 +45,9 @@ The new stack will inherit all configuration from the default stack. It's possib
     stackName: ram-another-instance
   ```
 * run kes deploy  
-  `$ ./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`.
+  `$ ./node_modules/.bin/kes cf deploy --deployment ram-my-deployment --region us-east-1`
 
-Once the deploy finishes (which may take a while), Kes will print useful information about the stack, including IP addresses of the interface and the database connection string. Use this connection string to set up the database structure:
+Once the deploy finishes (which may take a while), Kes prints information about the stack. This includes IP addresses and the database connection string. Use this connection string to set up the database structure:
 
 ```
 $ yarn setup --db postgres://your:own@connection:1234/string

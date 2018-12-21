@@ -1,86 +1,82 @@
 'use strict';
-const db = require('./');
-const config = require('../config');
 
-const DEBUG = config.debug;
-
-exports.dropProjects = function () {
-  DEBUG && console.log('Dropping table: projects');
+function dropProjects (db) {
+  console.log('Dropping table: projects');
   return db.schema.dropTableIfExists('projects');
 }
 
-exports.dropProjectsFiles = function () {
-  DEBUG && console.log('Dropping table: projects_files');
+function dropProjectsFiles (db) {
+  console.log('Dropping table: projects_files');
   return db.schema.dropTableIfExists('projects_files');
 }
 
-exports.dropProjectsAA = function () {
-  DEBUG && console.log('Dropping table: projects_aa');
+function dropProjectsAA (db) {
+  console.log('Dropping table: projects_aa');
   return db.schema.dropTableIfExists('projects_aa');
 }
 
-exports.dropScenarios = function () {
-  DEBUG && console.log('Dropping table: scenarios');
+function dropScenarios (db) {
+  console.log('Dropping table: scenarios');
   return db.schema.dropTableIfExists('scenarios');
 }
 
-exports.dropScenariosFiles = function () {
-  DEBUG && console.log('Dropping table: scenarios_files');
+function dropScenariosFiles (db) {
+  console.log('Dropping table: scenarios_files');
   return db.schema.dropTableIfExists('scenarios_files');
 }
 
-exports.dropScenariosSettings = function () {
-  DEBUG && console.log('Dropping table: scenarios_settings');
+function dropScenariosSettings (db) {
+  console.log('Dropping table: scenarios_settings');
   return db.schema.dropTableIfExists('scenarios_settings');
 }
 
-exports.dropOperations = function () {
-  DEBUG && console.log('Dropping table: operations');
+function dropOperations (db) {
+  console.log('Dropping table: operations');
   return db.schema.dropTableIfExists('operations');
 }
 
-exports.dropOperationsLogs = function () {
-  DEBUG && console.log('Dropping table: operations_logs');
+function dropOperationsLogs (db) {
+  console.log('Dropping table: operations_logs');
   return db.schema.dropTableIfExists('operations_logs');
 }
 
-exports.dropResults = function () {
-  DEBUG && console.log('Dropping table: results');
+function dropResults (db) {
+  console.log('Dropping table: results');
   return db.schema.dropTableIfExists('results');
 }
 
-exports.dropResultsPoi = function () {
-  DEBUG && console.log('Dropping table: results_poi');
+function dropResultsPoi (db) {
+  console.log('Dropping table: results_poi');
   return db.schema.dropTableIfExists('results_poi');
 }
 
-exports.dropProjectsOrigins = function () {
-  DEBUG && console.log('Dropping table: projects_origins');
+function dropProjectsOrigins (db) {
+  console.log('Dropping table: projects_origins');
   return db.schema.dropTableIfExists('projects_origins');
 }
 
-exports.dropProjectsOriginsIndicators = function () {
-  DEBUG && console.log('Dropping table: projects_origins_indicators');
+function dropProjectsOriginsIndicators (db) {
+  console.log('Dropping table: projects_origins_indicators');
   return db.schema.dropTableIfExists('projects_origins_indicators');
 }
 
-exports.dropProjectsSourceData = function () {
-  DEBUG && console.log('Dropping table: projects_source_data');
+function dropProjectsSourceData (db) {
+  console.log('Dropping table: projects_source_data');
   return db.schema.dropTableIfExists('projects_source_data');
 }
 
-exports.dropScenariosSourceData = function () {
-  DEBUG && console.log('Dropping table: scenarios_source_data');
+function dropScenariosSourceData (db) {
+  console.log('Dropping table: scenarios_source_data');
   return db.schema.dropTableIfExists('scenarios_source_data');
 }
 
-exports.dropWbCatalogResources = function () {
-  DEBUG && console.log('Dropping table: wbcatalog_resources');
+function dropWbCatalogResources (db) {
+  console.log('Dropping table: wbcatalog_resources');
   return db.schema.dropTableIfExists('wbcatalog_resources');
 }
 
-exports.createProjectsTable = function () {
-  DEBUG && console.log('Creating table: projects');
+function createProjectsTable (db) {
+  console.log('Creating table: projects');
   return db.schema.createTable('projects', table => {
     table.increments('id').primary();
     table.string('name');
@@ -93,8 +89,8 @@ exports.createProjectsTable = function () {
   });
 }
 
-exports.createProjectsFilesTable = function () {
-  DEBUG && console.log('Creating table: projects_files');
+function createProjectsFilesTable (db) {
+  console.log('Creating table: projects_files');
   return db.schema.createTable('projects_files', table => {
     table.increments('id').primary();
     table.string('name');
@@ -109,8 +105,8 @@ exports.createProjectsFilesTable = function () {
   });
 }
 
-exports.createProjectsAATable = function () {
-  DEBUG && console.log('Creating table: projects_aa');
+function createProjectsAATable (db) {
+  console.log('Creating table: projects_aa');
   return db.schema.createTable('projects_aa', table => {
     table.increments('id').primary();
     table.string('name');
@@ -123,8 +119,8 @@ exports.createProjectsAATable = function () {
   });
 }
 
-exports.createScenariosTable = function () {
-  DEBUG && console.log('Creating table: scenarios');
+function createScenariosTable (db) {
+  console.log('Creating table: scenarios');
   return db.schema.createTable('scenarios', table => {
     table.increments('id').primary();
     table.string('name');
@@ -142,8 +138,8 @@ exports.createScenariosTable = function () {
   });
 }
 
-exports.createScenariosFilesTable = function () {
-  DEBUG && console.log('Creating table: scenarios_files');
+function createScenariosFilesTable (db) {
+  console.log('Creating table: scenarios_files');
   return db.schema.createTable('scenarios_files', table => {
     table.increments('id').primary();
     table.string('name');
@@ -162,8 +158,8 @@ exports.createScenariosFilesTable = function () {
   });
 }
 
-exports.createScenariosSettingsTable = function () {
-  DEBUG && console.log('Creating table: scenarios_settings');
+function createScenariosSettingsTable (db) {
+  console.log('Creating table: scenarios_settings');
   return db.schema.createTable('scenarios_settings', table => {
     table.string('key');
     table.text('value');
@@ -176,8 +172,8 @@ exports.createScenariosSettingsTable = function () {
   });
 }
 
-exports.createOperationsTable = function () {
-  DEBUG && console.log('Creating table: operations');
+function createOperationsTable (db) {
+  console.log('Creating table: operations');
   return db.schema.createTable('operations', table => {
     table.increments('id').primary();
     table.string('name');
@@ -194,8 +190,8 @@ exports.createOperationsTable = function () {
   });
 }
 
-exports.createOperationsLogsTable = function () {
-  DEBUG && console.log('Creating table: operations_logs');
+function createOperationsLogsTable (db) {
+  console.log('Creating table: operations_logs');
   return db.schema.createTable('operations_logs', table => {
     table.increments('id').primary();
     table.integer('operation_id').unsigned();
@@ -208,8 +204,8 @@ exports.createOperationsLogsTable = function () {
   });
 }
 
-exports.createResultsTable = function () {
-  DEBUG && console.log('Creating table: results');
+function createResultsTable (db) {
+  console.log('Creating table: results');
   return db.schema.createTable('results', table => {
     table.increments('id').primary();
     table.integer('project_id').unsigned();
@@ -231,8 +227,8 @@ exports.createResultsTable = function () {
   });
 }
 
-exports.createResultsPoiTable = function () {
-  DEBUG && console.log('Creating table: results_poi');
+function createResultsPoiTable (db) {
+  console.log('Creating table: results_poi');
   return db.schema.createTable('results_poi', table => {
     table.increments('id').primary();
     table.integer('result_id').unsigned();
@@ -244,8 +240,8 @@ exports.createResultsPoiTable = function () {
   });
 }
 
-exports.createProjectsOriginsTable = function () {
-  DEBUG && console.log('Creating table: projects_origins');
+function createProjectsOriginsTable (db) {
+  console.log('Creating table: projects_origins');
   return db.schema.createTable('projects_origins', table => {
     table.increments('id').primary();
     table.integer('project_id').unsigned();
@@ -258,8 +254,8 @@ exports.createProjectsOriginsTable = function () {
   });
 }
 
-exports.createProjectsOriginsIndicatorsTable = function () {
-  DEBUG && console.log('Creating table: projects_origins_indicators');
+function createProjectsOriginsIndicatorsTable (db) {
+  console.log('Creating table: projects_origins_indicators');
   return db.schema.createTable('projects_origins_indicators', table => {
     table.increments('id').primary();
     table.integer('origin_id').unsigned();
@@ -273,8 +269,8 @@ exports.createProjectsOriginsIndicatorsTable = function () {
   });
 }
 
-exports.createProjectsSourceData = function () {
-  DEBUG && console.log('Creating table: projects_source_data');
+function createProjectsSourceData (db) {
+  console.log('Creating table: projects_source_data');
   return db.schema.createTable('projects_source_data', table => {
     table.increments('id').primary();
     table.integer('project_id').unsigned();
@@ -287,8 +283,8 @@ exports.createProjectsSourceData = function () {
   });
 }
 
-exports.createScenariosSourceData = function () {
-  DEBUG && console.log('Creating table: scenarios_source_data');
+function createScenariosSourceData (db) {
+  console.log('Creating table: scenarios_source_data');
   return db.schema.createTable('scenarios_source_data', table => {
     table.increments('id').primary();
     table.integer('project_id').unsigned();
@@ -305,8 +301,8 @@ exports.createScenariosSourceData = function () {
   });
 }
 
-exports.createWbCatalogResources = function () {
-  DEBUG && console.log('Creating table: wbcatalog_resources');
+function createWbCatalogResources (db) {
+  console.log('Creating table: wbcatalog_resources');
   return db.schema.createTable('wbcatalog_resources', table => {
     table.increments('id').primary();
     table.string('type');
@@ -318,35 +314,35 @@ exports.createWbCatalogResources = function () {
   });
 }
 
-exports.setupStructure = function () {
-  return dropScenariosFiles()
-  .then(() => dropProjectsFiles())
-  .then(() => dropResultsPoi())
-  .then(() => dropResults())
-  .then(() => dropProjectsAA())
-  .then(() => dropOperationsLogs())
-  .then(() => dropOperations())
-  .then(() => dropScenariosSettings())
-  .then(() => dropScenariosSourceData())
-  .then(() => dropScenarios())
-  .then(() => dropProjectsSourceData())
-  .then(() => dropProjectsOriginsIndicators())
-  .then(() => dropProjectsOrigins())
-  .then(() => dropProjects())
-  .then(() => dropWbCatalogResources())
-  .then(() => createProjectsTable())
-  .then(() => createProjectsAATable())
-  .then(() => createScenariosTable())
-  .then(() => createScenariosSettingsTable())
-  .then(() => createOperationsTable())
-  .then(() => createOperationsLogsTable())
-  .then(() => createProjectsFilesTable())
-  .then(() => createScenariosFilesTable())
-  .then(() => createProjectsOriginsTable())
-  .then(() => createProjectsOriginsIndicatorsTable())
-  .then(() => createResultsTable())
-  .then(() => createResultsPoiTable())
-  .then(() => createScenariosSourceData())
-  .then(() => createProjectsSourceData())
-  .then(() => createWbCatalogResources());
+exports.setupStructure = function (db) {
+  return dropScenariosFiles(db)
+  .then(() => dropProjectsFiles(db))
+  .then(() => dropResultsPoi(db))
+  .then(() => dropResults(db))
+  .then(() => dropProjectsAA(db))
+  .then(() => dropOperationsLogs(db))
+  .then(() => dropOperations(db))
+  .then(() => dropScenariosSettings(db))
+  .then(() => dropScenariosSourceData(db))
+  .then(() => dropScenarios(db))
+  .then(() => dropProjectsSourceData(db))
+  .then(() => dropProjectsOriginsIndicators(db))
+  .then(() => dropProjectsOrigins(db))
+  .then(() => dropProjects(db))
+  .then(() => dropWbCatalogResources(db))
+  .then(() => createProjectsTable(db))
+  .then(() => createProjectsAATable(db))
+  .then(() => createScenariosTable(db))
+  .then(() => createScenariosSettingsTable(db))
+  .then(() => createOperationsTable(db))
+  .then(() => createOperationsLogsTable(db))
+  .then(() => createProjectsFilesTable(db))
+  .then(() => createScenariosFilesTable(db))
+  .then(() => createProjectsOriginsTable(db))
+  .then(() => createProjectsOriginsIndicatorsTable(db))
+  .then(() => createResultsTable(db))
+  .then(() => createResultsPoiTable(db))
+  .then(() => createScenariosSourceData(db))
+  .then(() => createProjectsSourceData(db))
+  .then(() => createWbCatalogResources(db));
 }

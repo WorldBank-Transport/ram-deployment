@@ -1,8 +1,13 @@
 'use strict';
-const db = require('./db/');
-const setup = require('./db/structure');
+const knex = require('knex');
+const setup = require('./structure');
 
 const arg = (a) => process.argv.indexOf(a) !== -1;
+
+const db = knex({
+  client: 'pg',
+  connection: process.argv[2]
+});
 
 async function checkDangerousDbOp () {
   const exists = await db.schema.hasTable('scenarios');
@@ -13,22 +18,22 @@ async function checkDangerousDbOp () {
   }
 }
 
-async function main (params) {
+async function main () {
   try {
-    if (arg('--help') || arg('-h') || !arg('--db')) {
-      console.log('Options:');
-      console.log('  --db', '       Sets up database without data fixtures.');
+    if (arg('--help') || arg('-h') || process.argv.length < 3 || process.argv[2] === '--force-override') {
+      console.log('Set up the RAM database with:')
       console.log('');
+      console.log('  yarn setup [postgres_connection_string]');
+      console.log('');
+      console.log('Options:');
       console.log('  --force-override', '   Use to override safe data check.');
       console.log('                      WARNING: All data will be lost');
       console.log('');
       process.exit(0);
     }
 
-    if (arg('--db')) {
-      await checkDangerousDbOp();
-      await setup.setupStructure();
-    }
+    await checkDangerousDbOp();
+    await setup.setupStructure(db);
 
     console.log('done');
     process.exit(0);
