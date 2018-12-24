@@ -388,16 +388,18 @@ Resources:
                         - Endpoint.Address
                     - ":5432/{{../../rds.dbName}}"
           {{/if}}
-          {{#if this.apiMachine}}
-            - Name: API
-              Value:
-                Fn::Join:
-                  - ""
-                  - - "http://"
-                    - Fn::GetAtt:
-                      - {{this.apiMachine}}EC2Instance
-                      - PublicIp
-          {{/if}}
+          {{#unless this.envs.API}}
+            {{#if this.apiMachine}}
+              - Name: API
+                Value:
+                  Fn::Join:
+                    - ""
+                    - - "http://"
+                      - Fn::GetAtt:
+                        - {{this.apiMachine}}EC2Instance
+                        - PublicIp
+            {{/if}}
+          {{/unless}}
           {{# each this.envs}}
             - Name: {{@key}}
               Value: {{this}}

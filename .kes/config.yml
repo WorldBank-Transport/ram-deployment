@@ -89,6 +89,9 @@ default:
           envs:
             MBTOKEN: '{{MB_TOKEN}}'
             RAH_URL: 'http://hub.ruralaccess.info'
+            # Uncomment if you want to use a custom domain for the API, instead of the IP address that CF automatically sets for you.
+            # This will not configure the DNS, which has to be done separately
+            # API: 'http://api.custom-domain.org'
 
     ramAnalysis:
       count: 0
