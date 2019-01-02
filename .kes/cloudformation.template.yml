@@ -390,14 +390,14 @@ Resources:
           {{/if}}
           {{#unless this.envs.API}}
             {{#if this.apiMachine}}
-              - Name: API
-                Value:
-                  Fn::Join:
-                    - ""
-                    - - "http://"
-                      - Fn::GetAtt:
-                        - {{this.apiMachine}}EC2Instance
-                        - PublicIp
+            - Name: API
+              Value:
+                Fn::Join:
+                  - ""
+                  - - "http://"
+                    - Fn::GetAtt:
+                      - {{this.apiMachine}}EC2Instance
+                      - PublicIp
             {{/if}}
           {{/unless}}
           {{# each this.envs}}
