@@ -347,4 +347,6 @@ function setupStructure (db) {
   .then(() => createWbCatalogResources(db));
 }
 
-module.exports = setupStructure;
+module.exports = {
+  setupStructure
+};
