@@ -11,11 +11,16 @@ class UpdatedKes extends Kes {
         let apiAddress = output.find(o => o.OutputKey === 'apiIpAddress')['OutputValue']
         let dbConnection = output.find(o => o.OutputKey === 'dbConnectionString')['OutputValue']
 
-        return console.log(
-          `The stack ${r.Stacks[0].StackName} is deployed or updated. The main components are available through:
+        return console.log(`
+The stack ${r.Stacks[0].StackName} is deployed or updated. The main components are available through:
   - frontend: ${frontendAddress}
   - backend: ${apiAddress}
-  - db connection string: ${dbConnection}`
+  - db connection string: ${dbConnection}
+
+Is this the first time setting up this stack? Run the following command to set up the database:
+
+  $ yarn setup ${dbConnection}
+`
       )
     })
   }

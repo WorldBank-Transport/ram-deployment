@@ -314,7 +314,7 @@ function createWbCatalogResources (db) {
   });
 }
 
-exports.setupStructure = function (db) {
+function setupStructure (db) {
   return dropScenariosFiles(db)
   .then(() => dropProjectsFiles(db))
   .then(() => dropResultsPoi(db))
@@ -346,3 +346,7 @@ exports.setupStructure = function (db) {
   .then(() => createProjectsSourceData(db))
   .then(() => createWbCatalogResources(db));
 }
+
+module.exports = {
+  setupStructure
+};
